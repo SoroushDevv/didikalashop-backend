@@ -1,33 +1,30 @@
 const express = require("express");
 const router = express.Router();
-const pool = require ("./../db/SabzLearnShop")
+const pool = require("./../db/SabzLearnShop");
 
-
-// 📌 گرفتن همه‌ی پروفایل‌ها
+// Get all user profiles
 router.get("/", async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM user_profiles");
-    res.json(rows);
+    res.status(200).json(rows);
   } catch (err) {
-    res.status(500).json({ error: "Database error" });
+    res.status(500).json({ error: "Database error", details: err.message });
   }
 });
 
-
-// 📌 گرفتن پروفایل بر اساس user_id
+// Get a profile by user_id
 router.get("/:user_id", async (req, res) => {
   const { user_id } = req.params;
   try {
     const [rows] = await pool.query("SELECT * FROM user_profiles WHERE user_id = ?", [user_id]);
     if (rows.length === 0) return res.status(404).json({ error: "Profile not found" });
-    res.json(rows[0]);
+    res.status(200).json(rows[0]);
   } catch (err) {
-    res.status(500).json({ error: "Database error" });
+    res.status(500).json({ error: "Database error", details: err.message });
   }
 });
 
-
-// 📌 ساخت پروفایل جدید
+// Create a new profile
 router.post("/", async (req, res) => {
   const { user_id, profile_image } = req.body;
   try {
@@ -35,14 +32,13 @@ router.post("/", async (req, res) => {
       "INSERT INTO user_profiles (user_id, profile_image) VALUES (?, ?)",
       [user_id, profile_image]
     );
-    res.json({ id: result.insertId, user_id, profile_image });
+    res.status(201).json({ id: result.insertId, user_id, profile_image });
   } catch (err) {
-    res.status(500).json({ error: "Database error" });
+    res.status(500).json({ error: "Database error", details: err.message });
   }
 });
 
-
-// 📌 آپدیت پروفایل
+// Update a profile
 router.put("/:user_id", async (req, res) => {
   const { user_id } = req.params;
   const { profile_image } = req.body;
@@ -52,24 +48,22 @@ router.put("/:user_id", async (req, res) => {
       [profile_image, user_id]
     );
     if (result.affectedRows === 0) return res.status(404).json({ error: "Profile not found" });
-    res.json({ message: "Profile updated", user_id, profile_image });
+    res.status(200).json({ message: "Profile updated", user_id, profile_image });
   } catch (err) {
-    res.status(500).json({ error: "Database error" });
+    res.status(500).json({ error: "Database error", details: err.message });
   }
 });
 
-
-// 📌 حذف پروفایل
+// Delete a profile
 router.delete("/:user_id", async (req, res) => {
   const { user_id } = req.params;
   try {
     const [result] = await pool.query("DELETE FROM user_profiles WHERE user_id = ?", [user_id]);
     if (result.affectedRows === 0) return res.status(404).json({ error: "Profile not found" });
-    res.json({ message: "Profile deleted" });
+    res.status(200).json({ message: "Profile deleted" });
   } catch (err) {
-    res.status(500).json({ error: "Database error" });
+    res.status(500).json({ error: "Database error", details: err.message });
   }
 });
-
 
 module.exports = router;

@@ -2,9 +2,10 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
+const path = require("path");
 require("dotenv").config();
 
-// Router ها
+// Routers (all should use module.exports)
 const productsRouter = require("./routes/productsRoutes");
 const commentsRouter = require("./routes/commentsRoutes");
 const usersRouter = require("./routes/usersRoutes");
@@ -19,7 +20,6 @@ const blogsRouter = require("./routes/blogsRoutes");
 
 const app = express();
 const server = http.createServer(app);
-const path = require("path");
 
 // Socket.io
 const io = new Server(server, {
@@ -29,8 +29,8 @@ const io = new Server(server, {
       "http://localhost:8000",
       "https://semielevated-svetlana-crescive.ngrok-free.dev"
     ],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-},
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+  },
 });
 
 io.on("connection", (socket) => {
@@ -41,25 +41,24 @@ io.on("connection", (socket) => {
   });
 });
 
-// اجازه دسترسی به io از داخل روت‌ها
+// Make io accessible in routers
 app.set("io", io);
 
+// Middlewares
 app.use(cors({
-  origin: "*", 
+  origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
-
-
 app.use(express.json());
 
-// Middleware برای لاگ درخواست‌ها
+// Request logging middleware
 app.use((req, res, next) => {
   console.log(`Received ${req.method} request to ${req.url}`);
   next();
 });
 
-// روت‌ها
+// Routes
 app.use("/api/products", productsRouter);
 app.use("/api/blogs", blogsRouter);
 app.use("/api/comments", commentsRouter);
@@ -72,14 +71,13 @@ app.use("/api/categories", categoriesRouter);
 app.use("/api/cards", bankCardsRouter);
 app.use("/api/profilePics", profilePicRouter);
 
-// سرو build فرانت
-app.use(express.static(path.join(__dirname, "./../frontend/build")));
+// Serve frontend build
+// app.use(express.static(path.join(__dirname, "./../frontend/build")));
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "./../frontend/build", "index.html"));
+// });
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "./../frontend/build", "index.html"));
-});
-
-// 404
+// 404 handler
 app.use((req, res) => {
   res.status(404).send({ message: "Route not found" });
 });
@@ -90,5 +88,5 @@ app.use((err, req, res, next) => {
   res.status(500).send({ message: "Something went wrong!" });
 });
 
-const port = process.env.PORT || 8000;
+const port = process.env.PORT || 3000;
 server.listen(port, '0.0.0.0', () => console.log(`🚀 Server running on port ${port}`));

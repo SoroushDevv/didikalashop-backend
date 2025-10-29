@@ -1,14 +1,12 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const pool = require("./../db/SabzLearnShop");
-const util = require("util");
+const pool = require("./../db/SabzLearnShop"); // pool.promise() export شده
 require("dotenv").config();
 
 const usersRouter = express.Router();
-const query = util.promisify(pool.query).bind(pool);
 
-// 📌 Middleware برای اعتبارسنجی توکن JWT
+// 📌 JWT authentication middleware
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
@@ -23,6 +21,7 @@ const authenticateToken = (req, res, next) => {
   }
 };
 
+// 📌 User registration
 usersRouter.post("/register", async (req, res) => {
   const { username, password, phone, email, firstname, lastname, city, address, role } = req.body;
 
@@ -33,7 +32,7 @@ usersRouter.post("/register", async (req, res) => {
     return res.status(400).json({ message: "Invalid email format" });
 
   try {
-    const existingUsers = await query(
+    const [existingUsers] = await pool.query(
       "SELECT * FROM Users WHERE username = ? OR email = ?",
       [username.trim(), email.trim()]
     );
@@ -42,14 +41,9 @@ usersRouter.post("/register", async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password.trim(), 10);
 
-    // 🔹 توکن ۳۰ روزه
-    const token = jwt.sign(
-      { username: username.trim() },
-      process.env.JWT_SECRET,
-      { expiresIn: "30d" }
-    );
+    const token = jwt.sign({ username: username.trim() }, process.env.JWT_SECRET, { expiresIn: "30d" });
 
-    await query(
+    await pool.query(
       `INSERT INTO Users (firstname, lastname, username, password, phone, city, email, address, score, buy, token, role)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 0, ?, ? )`,
       [
@@ -73,11 +67,10 @@ usersRouter.post("/register", async (req, res) => {
   }
 });
 
-
-// 📌 دریافت همه کاربران
+// 📌 Get all users
 usersRouter.get("/", async (req, res) => {
   try {
-    const users = await query(
+    const [users] = await pool.query(
       `SELECT id, firstname, lastname, username, phone, city, email, address, score, buy, role, token FROM Users`
     );
     res.status(200).json(users);
@@ -87,11 +80,11 @@ usersRouter.get("/", async (req, res) => {
   }
 });
 
-// 📌 حذف کاربر
+// 📌 Delete user
 usersRouter.delete("/:userID", authenticateToken, async (req, res) => {
   try {
     const userID = req.params.userID;
-    const result = await query("DELETE FROM Users WHERE id = ?", [userID]);
+    const [result] = await pool.query("DELETE FROM Users WHERE id = ?", [userID]);
     if (result.affectedRows === 0)
       return res.status(404).json({ message: "User not found" });
 
@@ -102,7 +95,7 @@ usersRouter.delete("/:userID", authenticateToken, async (req, res) => {
   }
 });
 
-// 📌 ویرایش کاربر
+// 📌 Update user
 usersRouter.put("/:userID", authenticateToken, async (req, res) => {
   try {
     const userID = req.params.userID;
@@ -117,7 +110,7 @@ usersRouter.put("/:userID", authenticateToken, async (req, res) => {
 
     const hashedPassword = password ? await bcrypt.hash(password.trim(), 10) : null;
 
-    const result = await query(
+    const [result] = await pool.query(
       `UPDATE Users 
        SET firstname = ?, lastname = ?, username = ?, password = ?, phone = ?, city = ?, email = ?, address = ?, score = ?, buy = ?, role = ?
        WHERE id = ?`,
@@ -147,7 +140,7 @@ usersRouter.put("/:userID", authenticateToken, async (req, res) => {
   }
 });
 
-// 📌 آپدیت بخشی از اطلاعات کاربر (PATCH)
+// 📌 Partial user update (PATCH)
 usersRouter.patch("/:userID", authenticateToken, async (req, res) => {
   try {
     const userID = req.params.userID;
@@ -157,7 +150,6 @@ usersRouter.patch("/:userID", authenticateToken, async (req, res) => {
       return res.status(400).json({ message: "No fields provided for update" });
     }
 
-    // فیلتر فیلدهای معتبر
     const allowedFields = ["firstname", "lastname", "username", "password", "phone", "city", "email", "address", "score", "buy", "role"];
     const updates = [];
     const values = [];
@@ -182,7 +174,7 @@ usersRouter.patch("/:userID", authenticateToken, async (req, res) => {
     const sql = `UPDATE Users SET ${updates.join(", ")} WHERE id = ?`;
     values.push(userID);
 
-    const result = await query(sql, values);
+    const [result] = await pool.query(sql, values);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "User not found" });
@@ -195,79 +187,75 @@ usersRouter.patch("/:userID", authenticateToken, async (req, res) => {
   }
 });
 
+// 📌 Change user password
 usersRouter.put("/:userID/password", authenticateToken, async (req, res) => {
   try {
-    const requester = req.user; // اطلاعات استخراج‌شده از JWT
+    const requester = req.user;
     const targetUserID = parseInt(req.params.userID, 10);
     const { currentPassword, newPassword } = req.body;
 
     if (isNaN(targetUserID)) {
-      return res.status(400).json({ error: "شناسه کاربر نامعتبر است" });
+      return res.status(400).json({ error: "Invalid user ID" });
     }
 
     if (!newPassword || typeof newPassword !== "string" || newPassword.length < 6) {
-      return res.status(400).json({ error: "پسورد جدید باید حداقل 6 کاراکتر باشد" });
+      return res.status(400).json({ error: "New password must be at least 6 characters" });
     }
 
-    // گرفتن کاربر هدف از دیتابیس
-    const userRows = await query("SELECT id, password, username, role FROM Users WHERE id = ?", [targetUserID]);
+    const [userRows] = await pool.query("SELECT id, password, username, role FROM Users WHERE id = ?", [targetUserID]);
     if (!userRows.length) {
-      return res.status(404).json({ error: "کاربر یافت نشد" });
+      return res.status(404).json({ error: "User not found" });
     }
     const targetUser = userRows[0];
 
-    // قوانین دسترسی
     if (requester.role === "user" && requester.id !== targetUserID) {
-      return res.status(403).json({ error: "فقط می‌توانید رمز خودتان را تغییر دهید" });
+      return res.status(403).json({ error: "Users can only change their own password" });
     }
 
     if (requester.role === "admin" && targetUser.role === "admin" && requester.id !== targetUserID) {
-      return res.status(403).json({ error: "نمی‌توانید رمز admin دیگری را تغییر دهید" });
+      return res.status(403).json({ error: "Admin cannot change another admin's password" });
     }
 
-    // بررسی پسورد فعلی برای کاربران عادی
     if (requester.role === "user" || (requester.role === "admin" && requester.id === targetUserID)) {
       if (!currentPassword) {
-        return res.status(400).json({ error: "پسورد فعلی لازم است" });
+        return res.status(400).json({ error: "Current password is required" });
       }
       const passwordMatches = await bcrypt.compare(currentPassword, targetUser.password);
       if (!passwordMatches) {
-        return res.status(401).json({ error: "پسورد فعلی اشتباه است" });
+        return res.status(401).json({ error: "Current password is incorrect" });
       }
     }
 
-    // هش کردن پسورد جدید
     const hashed = await bcrypt.hash(newPassword, 10);
-
-    // آپدیت دیتابیس
-    const result = await query("UPDATE Users SET password = ? WHERE id = ?", [hashed, targetUserID]);
+    const [result] = await pool.query("UPDATE Users SET password = ? WHERE id = ?", [hashed, targetUserID]);
 
     if (result.affectedRows === 0) {
-      return res.status(500).json({ error: "بروزرسانی رمز موفقیت‌آمیز نبود" });
+      return res.status(500).json({ error: "Password update failed" });
     }
 
-    res.status(200).json({ message: "رمز عبور با موفقیت تغییر کرد" });
+    res.status(200).json({ message: "Password changed successfully" });
 
   } catch (err) {
     console.error("Error changing password:", err);
-    res.status(500).json({ error: "خطا در سرور" });
+    res.status(500).json({ error: "Server error" });
   }
 });
 
+// 📌 User login
 usersRouter.post("/login", async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ message: "Username and password required" });
 
   try {
-    const rows = await query("SELECT * FROM Users WHERE username = ?", [username]);
-    if (!rows.length) return res.status(401).json({ message: "نام کاربری یا رمز عبور اشتباه است" });
+    const [rows] = await pool.query("SELECT * FROM Users WHERE username = ?", [username]);
+    if (!rows.length) return res.status(401).json({ message: "Incorrect username or password" });
 
     const user = rows[0];
     const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(401).json({ message: "نام کاربری یا رمز عبور اشتباه است" });
+    if (!match) return res.status(401).json({ message: "Incorrect username or password" });
 
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "30d" });
-    await query("UPDATE Users SET token = ? WHERE id = ?", [token, user.id]);
+    await pool.query("UPDATE Users SET token = ? WHERE id = ?", [token, user.id]);
 
     res.status(200).json({ user, token });
 

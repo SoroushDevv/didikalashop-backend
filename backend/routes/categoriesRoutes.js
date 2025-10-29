@@ -1,9 +1,7 @@
 const express = require("express");
 const pool = require("./../db/SabzLearnShop");
-const util = require("util");
 
 const categoriesRouter = express.Router();
-const query = util.promisify(pool.query).bind(pool);
 
 // GET: دریافت تمام دسته‌بندی‌ها
 categoriesRouter.get("/", async (req, res) => {
@@ -15,7 +13,7 @@ categoriesRouter.get("/", async (req, res) => {
         parent_id 
       FROM categories
     `;
-    const result = await query(selectAllCategoriesQuery);
+    const [result] = await pool.query(selectAllCategoriesQuery);
 
     const formattedResult = result.map((category) => ({
       id: Number(category.id),
@@ -36,7 +34,7 @@ categoriesRouter.delete("/:categoryID", async (req, res) => {
     const categoryID = parseInt(req.params.categoryID);
     if (isNaN(categoryID)) return res.status(400).json({ message: "Invalid categoryID" });
 
-    const result = await query("DELETE FROM categories WHERE id = ?", [categoryID]);
+    const [result] = await pool.query("DELETE FROM categories WHERE id = ?", [categoryID]);
     if (result.affectedRows === 0) return res.status(404).json({ message: "Category not found" });
 
     res.status(200).json({ message: "Category deleted successfully" });
@@ -54,7 +52,7 @@ categoriesRouter.put("/active-category/:categoryID/:isActive", async (req, res) 
 
     if (isNaN(categoryID)) return res.status(400).json({ message: "Invalid categoryID" });
 
-    const result = await query("UPDATE categories SET isActive = ? WHERE id = ?", [isActive, categoryID]);
+    const [result] = await pool.query("UPDATE categories SET isActive = ? WHERE id = ?", [isActive, categoryID]);
     if (result.affectedRows === 0) return res.status(404).json({ message: "Category not found" });
 
     res.status(200).json({ message: "Category status updated successfully" });

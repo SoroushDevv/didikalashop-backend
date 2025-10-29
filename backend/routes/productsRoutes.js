@@ -1,16 +1,12 @@
 const express = require("express");
-const pool = require("./../db/SabzLearnShop");
-const util = require("util");
+const pool = require("./../db/SabzLearnShop"); // بدون .promise()
 
 const productsRouter = express.Router();
-const query = util.promisify(pool.query).bind(pool);
 
-/* ===========================
-   GET : دریافت همه محصولات
-=========================== */
+// GET all products
 productsRouter.get("/", async (req, res) => {
   try {
-    const products = await query("SELECT * FROM products");
+    const [products] = await pool.query("SELECT * FROM products");
     res.status(200).json(products);
   } catch (err) {
     console.error("Error fetching products:", err);
@@ -18,9 +14,7 @@ productsRouter.get("/", async (req, res) => {
   }
 });
 
-/* ===========================
-   POST : افزودن محصول جدید
-=========================== */
+// POST add new product
 productsRouter.post("/", async (req, res) => {
   const {
     title,
@@ -38,7 +32,6 @@ productsRouter.post("/", async (req, res) => {
     categoryID,
   } = req.body;
 
-  // فیلدهای اجباری
   if (!title || price === undefined || count === undefined || !categoryID) {
     return res
       .status(400)
@@ -46,7 +39,7 @@ productsRouter.post("/", async (req, res) => {
   }
 
   try {
-    const result = await query(
+    const [result] = await pool.query(
       `INSERT INTO products
        (title, price, count, img, popularity, sale, hasDiscount,
         discountEndDate, discountPercent, colors, productDesc, url, categoryID)
@@ -77,9 +70,7 @@ productsRouter.post("/", async (req, res) => {
   }
 });
 
-/* ===========================
-   PUT : ویرایش محصول
-=========================== */
+// PUT update product
 productsRouter.put("/:productID", async (req, res) => {
   const productID = req.params.productID;
   const {
@@ -103,7 +94,7 @@ productsRouter.put("/:productID", async (req, res) => {
   }
 
   try {
-    const result = await query(
+    const [result] = await pool.query(
       `UPDATE products
        SET title = ?, price = ?, count = ?, img = ?, popularity = ?, sale = ?,
            hasDiscount = ?, discountEndDate = ?, discountPercent = ?,
@@ -137,16 +128,14 @@ productsRouter.put("/:productID", async (req, res) => {
   }
 });
 
-/* ===========================
-   DELETE : حذف محصول
-=========================== */
+// DELETE product
 productsRouter.delete("/:productID", async (req, res) => {
   const productID = req.params.productID;
   if (!/^\d+$/.test(productID))
     return res.status(400).json({ error: "productID نامعتبر است" });
 
   try {
-    const result = await query("DELETE FROM products WHERE id = ?", [productID]);
+    const [result] = await pool.query("DELETE FROM products WHERE id = ?", [productID]);
     if (result.affectedRows === 0)
       return res.status(404).json({ error: "محصول یافت نشد" });
 

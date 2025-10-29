@@ -1,9 +1,7 @@
 const express = require("express");
 const pool = require("./../db/SabzLearnShop");
-const util = require("util");
 
 const blogsRouter = express.Router();
-const query = util.promisify(pool.query).bind(pool);
 
 // GET: دریافت تمام بلاگ‌ها
 blogsRouter.get("/", async (req, res) => {
@@ -14,7 +12,7 @@ blogsRouter.get("/", async (req, res) => {
       FROM blogs
       ORDER BY created_at DESC
     `;
-    const result = await query(selectAllBlogsQuery);
+    const [result] = await pool.query(selectAllBlogsQuery);
 
     res.status(200).json(result);
   } catch (err) {
@@ -29,7 +27,7 @@ blogsRouter.get("/:blogID", async (req, res) => {
     const blogID = parseInt(req.params.blogID);
     if (isNaN(blogID)) return res.status(400).json({ message: "Invalid blogID" });
 
-    const result = await query("SELECT * FROM blogs WHERE id = ?", [blogID]);
+    const [result] = await pool.query("SELECT * FROM blogs WHERE id = ?", [blogID]);
     if (result.length === 0) return res.status(404).json({ message: "Blog not found" });
 
     res.status(200).json(result[0]);
@@ -53,7 +51,7 @@ blogsRouter.post("/", async (req, res) => {
       (title, slug, category, excerpt, content, cover_image, authorID, related_productID, status, seo_title, seo_description, published_at) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    const result = await query(insertQuery, [
+    const [result] = await pool.query(insertQuery, [
       title, slug, category, excerpt, content, cover_image, authorID, related_productID || null, status || "draft", seo_title, seo_description, published_at || null
     ]);
 
@@ -77,7 +75,7 @@ blogsRouter.put("/:blogID", async (req, res) => {
         title=?, slug=?, category=?, excerpt=?, content=?, cover_image=?, authorID=?, related_productID=?, status=?, seo_title=?, seo_description=?, published_at=?
       WHERE id=?
     `;
-    const result = await query(updateQuery, [
+    const [result] = await pool.query(updateQuery, [
       title, slug, category, excerpt, content, cover_image, authorID, related_productID || null, status || "draft", seo_title, seo_description, published_at || null, blogID
     ]);
 
@@ -96,7 +94,7 @@ blogsRouter.delete("/:blogID", async (req, res) => {
     const blogID = parseInt(req.params.blogID);
     if (isNaN(blogID)) return res.status(400).json({ message: "Invalid blogID" });
 
-    const result = await query("DELETE FROM blogs WHERE id = ?", [blogID]);
+    const [result] = await pool.query("DELETE FROM blogs WHERE id = ?", [blogID]);
     if (result.affectedRows === 0) return res.status(404).json({ message: "Blog not found" });
 
     res.status(200).json({ message: "Blog deleted successfully" });

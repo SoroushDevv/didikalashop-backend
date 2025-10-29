@@ -1,9 +1,7 @@
 const express = require("express");
 const pool = require("./../db/SabzLearnShop");
-const util = require("util");
 
 const adminsRouter = express.Router();
-const query = util.promisify(pool.query).bind(pool);
 
 // GET: دریافت اطلاعات ادمین با توکن
 adminsRouter.get("/", async (req, res) => {
@@ -14,7 +12,7 @@ adminsRouter.get("/", async (req, res) => {
     }
 
     const selectMainAdminQuery = `SELECT * FROM Admins WHERE token = ?`;
-    const result = await query(selectMainAdminQuery, [adminToken]);
+    const [result] = await pool.query(selectMainAdminQuery, [adminToken]);
 
     if (!result.length) {
       return res.status(404).json({ message: "Admin not found" });
