@@ -77,7 +77,7 @@ ordersRouter.get("/", async (req, res) => {
       SELECT o.id as orderID, o.userID, o.date, o.hour, o.isActive,
              oi.id as orderItemID, oi.productID, oi.quantity, oi.color, oi.price
       FROM Orders o
-      LEFT JOIN order_items oi ON o.id = oi.orderID
+      LEFT JOIN Order_items oi ON o.id = oi.orderID
       ORDER BY o.date DESC, o.hour DESC
     `);
 
@@ -107,7 +107,7 @@ ordersRouter.get("/user/:userID", async (req, res) => {
       SELECT o.id as orderID, o.userID, o.date, o.hour, o.isActive,
              oi.id as orderItemID, oi.productID, oi.quantity, oi.color, oi.price
       FROM Orders o
-      LEFT JOIN order_items oi ON o.id = oi.orderID
+      LEFT JOIN Order_items oi ON o.id = oi.orderID
       WHERE o.userID = ?
       ORDER BY o.date DESC, o.hour DESC
     `, [userID]);

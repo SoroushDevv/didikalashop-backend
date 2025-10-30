@@ -16,7 +16,7 @@ bankCardsRouter.get("/", async (req, res) => {
         u.id AS user_id,
         u.username
       FROM Card_details c
-      INNER JOIN users u ON u.id = c.user_id
+      INNER JOIN Users u ON u.id = c.user_id
     `;
     const [result] = await pool.query(sql);
     res.status(200).json(result);

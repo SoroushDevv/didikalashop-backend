@@ -11,8 +11,8 @@ async function fetchCommentByID(commentID) {
        u.id AS userID, u.username AS userName, u.role AS userRole, 
        p.id AS productID, p.title AS productTitle
      FROM Comments c
-     INNER JOIN users u ON u.id = c.userID
-     INNER JOIN products p ON p.id = c.productID
+     INNER JOIN Users u ON u.id = c.userID
+     INNER JOIN Products p ON p.id = c.productID
      WHERE c.id = ?`,
     [commentID]
   );
@@ -29,8 +29,8 @@ commentsRouter.get("/", async (req, res) => {
         u.id AS userID, u.username AS userName, u.role AS userRole, 
         p.id AS productID, p.title AS productTitle
       FROM Comments c
-      INNER JOIN users u ON u.id = c.userID 
-      INNER JOIN products p ON p.id = c.productID
+      INNER JOIN Users u ON u.id = c.userID 
+      INNER JOIN Products p ON p.id = c.productID
       WHERE c.status = 'approved'
     `;
     const params = [];
