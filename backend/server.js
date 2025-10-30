@@ -59,17 +59,17 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use("/api/products", productsRouter);
-app.use("/api/blogs", blogsRouter);
-app.use("/api/comments", commentsRouter);
-app.use("/api/users", usersRouter);
-app.use("/api/orders", ordersRouter);
-app.use("/api/offs", offsRouter);
-app.use("/api/admins", adminsRouter);
-app.use("/api/addresses", addressesRouter);
-app.use("/api/categories", categoriesRouter);
-app.use("/api/cards", bankCardsRouter);
-app.use("/api/profilePics", profilePicRouter);
+app.use("/products", productsRouter);
+app.use("/blogs", blogsRouter);
+app.use("/comments", commentsRouter);
+app.use("/users", usersRouter);
+app.use("/orders", ordersRouter);
+app.use("/offs", offsRouter);
+app.use("/admins", adminsRouter);
+app.use("/addresses", addressesRouter);
+app.use("/categories", categoriesRouter);
+app.use("/cards", bankCardsRouter);
+app.use("/profilePics", profilePicRouter);
 
 
 
