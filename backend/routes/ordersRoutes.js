@@ -30,14 +30,15 @@ ordersRouter.post("/", authenticateToken, async (req, res) => {
     if (!hour || !/^\d{2}:\d{2}:\d{2}$/.test(hour)) return res.status(400).json({ message: "Invalid hour format" });
     if (!Array.isArray(items) || items.length === 0) return res.status(400).json({ message: "Order must contain at least one product" });
 
+    // بررسی وجود کاربر
     const [userResult] = await pool.query("SELECT id FROM Users WHERE id = ?", [userID]);
     if (userResult.length === 0) return res.status(404).json({ message: "User not found" });
 
+    // ثبت سفارش
     const [orderInsert] = await pool.query(
       "INSERT INTO Orders (userID, date, hour, isActive) VALUES (?, ?, ?, ?)",
-      [userID, date, hour, true]
+      [userID, date, hour, 1]
     );
-
     const orderID = orderInsert.insertId;
     const orderItems = [];
 
@@ -46,26 +47,30 @@ ordersRouter.post("/", authenticateToken, async (req, res) => {
       if (!productID || isNaN(productID)) continue;
       if (!color || color.trim() === "") continue;
 
+      // بررسی وجود محصول
       const [productResult] = await pool.query("SELECT id, price FROM Products WHERE id = ?", [productID]);
       if (productResult.length === 0) continue;
 
       const price = productResult[0].price;
 
+      // ثبت آیتم سفارش
       await pool.query(
-        "INSERT INTO order_items (orderID, productID, quantity, color, price) VALUES (?, ?, ?, ?, ?)",
+        "INSERT INTO Order_items (orderID, productID, quantity, color, price) VALUES (?, ?, ?, ?, ?)",
         [orderID, productID, quantity, color, price]
       );
 
       orderItems.push({ productID, quantity, color, price });
     }
 
-    const newOrder = { orderID, userID, date, hour, isActive: true, items: orderItems };
+    const newOrder = { orderID, userID, date, hour, isActive: 1, items: orderItems };
 
+    // ارسال از طریق Socket.io
     const io = req.app.get("io");
     io.emit("order_created", newOrder);
 
     res.status(201).json({ message: "Order created successfully", order: newOrder });
   } catch (err) {
+    console.error("❌ Error creating order:", err);
     res.status(500).json({ message: "Database error", details: err.message });
   }
 });
@@ -93,6 +98,7 @@ ordersRouter.get("/", async (req, res) => {
 
     res.status(200).json(Object.values(ordersMap));
   } catch (err) {
+    console.error("❌ Error fetching orders:", err);
     res.status(500).json({ message: "Database error", details: err.message });
   }
 });
@@ -124,6 +130,7 @@ ordersRouter.get("/user/:userID", async (req, res) => {
 
     res.status(200).json(Object.values(ordersMap));
   } catch (err) {
+    console.error("❌ Error fetching user orders:", err);
     res.status(500).json({ message: "Database error", details: err.message });
   }
 });
@@ -144,6 +151,7 @@ ordersRouter.delete("/:orderID", async (req, res) => {
 
     res.status(200).json({ message: "Order deleted successfully" });
   } catch (err) {
+    console.error("❌ Error deleting order:", err);
     res.status(500).json({ message: "Database error", details: err.message });
   }
 });
@@ -180,6 +188,7 @@ ordersRouter.put("/active-order/:orderID", async (req, res) => {
 
     res.status(200).json({ message: "Order updated successfully" });
   } catch (err) {
+    console.error("❌ Error updating order:", err);
     res.status(500).json({ message: "Database error", details: err.message });
   }
 });
