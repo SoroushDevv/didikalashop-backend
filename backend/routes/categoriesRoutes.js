@@ -11,7 +11,7 @@ categoriesRouter.get("/", async (req, res) => {
         id, 
         title, 
         parent_id 
-      FROM categories
+      FROM Categories
     `;
     const [result] = await pool.query(selectAllCategoriesQuery);
 
