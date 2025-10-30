@@ -1,5 +1,5 @@
 const express = require("express");
-const pool = require("./../db/SabzLearnShop"); // بدون .promise()
+const pool = require("../db/DidikalaDB"); 
 
 const productsRouter = express.Router();
 

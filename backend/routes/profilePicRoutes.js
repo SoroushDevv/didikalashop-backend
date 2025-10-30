@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const pool = require("./../db/SabzLearnShop");
+const pool = require("./../db/DidikalaDB");
 
 // Get all user profiles
 router.get("/", async (req, res) => {

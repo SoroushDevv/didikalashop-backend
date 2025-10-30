@@ -1,6 +1,6 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
-const pool = require("./../db/SabzLearnShop");
+const pool = require("./../db/DidikalaDB");
 
 const addressesRouter = express.Router();
 

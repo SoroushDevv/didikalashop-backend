@@ -1,7 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const pool = require("./../db/SabzLearnShop"); // pool.promise() export شده
+const pool = require("./../db/DidikalaDB"); 
 require("dotenv").config();
 
 const usersRouter = express.Router();

@@ -1,5 +1,5 @@
 const express = require("express");
-const pool = require("./../db/SabzLearnShop");
+const pool = require("./../db/DidikalaDB");
 
 const commentsRouter = express.Router();
 
