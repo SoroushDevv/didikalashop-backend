@@ -34,7 +34,7 @@ ordersRouter.post("/", authenticateToken, async (req, res) => {
     if (userResult.length === 0) return res.status(404).json({ message: "User not found" });
 
     const [orderInsert] = await pool.query(
-      "INSERT INTO orders (userID, date, hour, isActive) VALUES (?, ?, ?, ?)",
+      "INSERT INTO Orders (userID, date, hour, isActive) VALUES (?, ?, ?, ?)",
       [userID, date, hour, true]
     );
 
@@ -76,7 +76,7 @@ ordersRouter.get("/", async (req, res) => {
     const [orders] = await pool.query(`
       SELECT o.id as orderID, o.userID, o.date, o.hour, o.isActive,
              oi.id as orderItemID, oi.productID, oi.quantity, oi.color, oi.price
-      FROM orders o
+      FROM Orders o
       LEFT JOIN order_items oi ON o.id = oi.orderID
       ORDER BY o.date DESC, o.hour DESC
     `);
@@ -106,7 +106,7 @@ ordersRouter.get("/user/:userID", async (req, res) => {
     const [orders] = await pool.query(`
       SELECT o.id as orderID, o.userID, o.date, o.hour, o.isActive,
              oi.id as orderItemID, oi.productID, oi.quantity, oi.color, oi.price
-      FROM orders o
+      FROM Orders o
       LEFT JOIN order_items oi ON o.id = oi.orderID
       WHERE o.userID = ?
       ORDER BY o.date DESC, o.hour DESC
@@ -135,7 +135,7 @@ ordersRouter.delete("/:orderID", async (req, res) => {
     if (isNaN(orderID)) return res.status(400).json({ message: "Invalid orderID" });
 
     await pool.query("DELETE FROM order_items WHERE orderID = ?", [orderID]);
-    const [result] = await pool.query("DELETE FROM orders WHERE id = ?", [orderID]);
+    const [result] = await pool.query("DELETE FROM Orders WHERE id = ?", [orderID]);
 
     if (result.affectedRows === 0) return res.status(404).json({ message: "Order not found" });
 
@@ -157,7 +157,7 @@ ordersRouter.put("/active-order/:orderID", async (req, res) => {
     if (isNaN(orderID) || orderID <= 0) return res.status(400).json({ message: "Invalid orderID" });
 
     if (isActive !== undefined) {
-      await pool.query("UPDATE orders SET isActive = ? WHERE id = ?", [isActive ? 1 : 0, orderID]);
+      await pool.query("UPDATE Orders SET isActive = ? WHERE id = ?", [isActive ? 1 : 0, orderID]);
     }
 
     if (Array.isArray(items)) {

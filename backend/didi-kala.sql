@@ -23,10 +23,10 @@ SET
 /*!40101 SET NAMES utf8mb4 */;
 
 -- Table structure for table `admins`
-DROP TABLE IF EXISTS `admins`;
+DROP TABLE IF EXISTS `Admins`;
 
 CREATE TABLE
-  `admins` (
+  `Admins` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `firstname` VARCHAR(50) COLLATE utf8mb4_persian_ci NOT NULL,
     `lastname` VARCHAR(50) COLLATE utf8mb4_persian_ci NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE
 
 -- Dumping data for table `admins`
 INSERT INTO
-  `admins` (
+  `Admins` (
     `id`,
     `firstname`,
     `lastname`,
@@ -103,10 +103,10 @@ VALUES
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo1LCJ1c2VybmFtZSI6Imhvc3NlaW5fYWRtaW4iLCJleHAiOjE3NDc4OTc4Nzl9.dummy_signature_hossein'
   );
 
-DROP TABLE IF EXISTS `users`;
+DROP TABLE IF EXISTS `Users`;
 
 CREATE TABLE
-  users (
+  Users (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     firstname VARCHAR(50) COLLATE utf8mb4_persian_ci NULL,
     lastname VARCHAR(50) COLLATE utf8mb4_persian_ci NULL,
@@ -127,7 +127,7 @@ CREATE TABLE
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_persian_ci;
 
 INSERT INTO
-  users (
+  Users (
     id,
     firstname,
     lastname,
@@ -294,11 +294,11 @@ VALUES
     'user'
   );
 
--- Table structure for table `user_profiles`
-DROP TABLE IF EXISTS `user_profiles`;
+-- Table structure for table `User_profiles`
+DROP TABLE IF EXISTS `User_profiles`;
 
 CREATE TABLE
-  `user_profiles` (
+  `User_profiles` (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id INT UNSIGNED NOT NULL,
     profile_image VARCHAR(255) COLLATE utf8mb4_persian_ci NOT NULL,
@@ -306,12 +306,12 @@ CREATE TABLE
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE KEY user_id (user_id),
-    CONSTRAINT fk_user_profiles_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT fk_user_profiles_user FOREIGN KEY (user_id) REFERENCES Users (id) ON DELETE CASCADE ON UPDATE CASCADE
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_persian_ci;
 
--- Dumping data for table `card_details`
+-- Dumping data for table `Card_details`
 INSERT INTO
-  user_profiles (user_id, profile_image)
+  User_profiles (user_id, profile_image)
 VALUES
   (1, '/uploads/profiles/ali_mohammadi.jpg'),
   (2, '/uploads/profiles/zahra_ahmadi.jpg'),
@@ -324,11 +324,11 @@ VALUES
   (9, '/uploads/profiles/amir_khanmohammadi.jpg'),
   (10, '/uploads/profiles/leila_noori.jpg');
 
--- Table structure for table `card_details`
-DROP TABLE IF EXISTS `card_details`;
+-- Table structure for table `Card_details`
+DROP TABLE IF EXISTS `Card_details`;
 
 CREATE TABLE
-  `card_details` (
+  `Card_details` (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id INT UNSIGNED NOT NULL,
     card_number CHAR(16) COLLATE utf8mb4_persian_ci NOT NULL, -- فقط شماره کارت
@@ -337,13 +337,13 @@ CREATE TABLE
     status ENUM ('active', 'inactive') DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES Users (id) ON DELETE CASCADE,
     UNIQUE KEY unique_card (card_number)
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_persian_ci;
 
--- Dumping data for table `card_details`
+-- Dumping data for table `Card_details`
 INSERT INTO
-  card_details (
+  Card_details (
     user_id,
     card_number,
     bank_name,
@@ -640,10 +640,10 @@ VALUES
   );
 
 -- Table structure for table `categories`
-DROP TABLE IF EXISTS `categories`;
+DROP TABLE IF EXISTS `Categories`;
 
 CREATE TABLE
-  `categories` (
+  `Categories` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `title` VARCHAR(100) COLLATE utf8mb4_persian_ci NOT NULL,
     `parent_id` INT UNSIGNED DEFAULT NULL,
@@ -654,7 +654,7 @@ CREATE TABLE
 
 -- والدها
 INSERT INTO
-  `categories` (`id`, `title`, `parent_id`)
+  `Categories` (`id`, `title`, `parent_id`)
 VALUES
   (1, 'گوشی', NULL),
   (2, 'لپتاپ', NULL),
@@ -719,11 +719,11 @@ VALUES
 (60, 'ابزار باغبانی', 17);
 
 -- حذف جدول products در صورت وجود
-DROP TABLE IF EXISTS `products`;
+DROP TABLE IF EXISTS `Products`;
 
 -- ایجاد جدول products
 CREATE TABLE
-  `products` (
+  `Products` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `title` VARCHAR(100) COLLATE utf8mb4_persian_ci NOT NULL,
     `price` DECIMAL(15, 2) UNSIGNED NOT NULL CHECK (`price` > 0),
@@ -748,7 +748,7 @@ CREATE TABLE
 
 -- داده نمونه با درصد تخفیف
 INSERT INTO
-  `products` (
+  `Products` (
     `id`,
     `title`,
     `price`,
@@ -829,11 +829,11 @@ VALUES
   (62,'اتو بخار فیلیپس',2800000.00,40,'philips-iron.jpg',2,100.00,TRUE,'2025-08-16 21:42:00',10,'["آبی","سفید"]','اتو بخار سریع با قابلیت ضدچکه','philips-iron-url',42)
   ;
 
--- Table structure for table `comments`
-DROP TABLE IF EXISTS `comments`;
+-- Table structure for table `Comments`
+DROP TABLE IF EXISTS `Comments`;
 
 CREATE TABLE
-  `comments` (
+  `Comments` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `body` TEXT COLLATE utf8mb4_persian_ci NOT NULL,
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -844,7 +844,7 @@ CREATE TABLE
     `reply_id` INT UNSIGNED NULL DEFAULT NULL,
     `status` ENUM ('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`userID`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`userID`) REFERENCES `Users` (`id`) ON DELETE CASCADE,
     FOREIGN KEY (`productID`) REFERENCES `products` (`id`) ON DELETE CASCADE,
     FOREIGN KEY (`reply_id`) REFERENCES `comments` (`id`) ON DELETE SET NULL,
     INDEX `product_idx` (`productID`, `status`, `is_reply`),
@@ -853,7 +853,7 @@ CREATE TABLE
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_persian_ci;
 
 INSERT INTO
-  `comments` (
+  `Comments` (
     `id`,
     `body`,
     `created_at`,
@@ -1065,10 +1065,10 @@ VALUES
     'approved'
   );
 
-DROP TABLE IF EXISTS `blogs`;
+DROP TABLE IF EXISTS `Blogs`;
 
 CREATE TABLE
-  `blogs` (
+  `Blogs` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `title` VARCHAR(255) COLLATE utf8mb4_persian_ci NOT NULL,
     `slug` VARCHAR(255) COLLATE utf8mb4_persian_ci NOT NULL UNIQUE,
@@ -1086,8 +1086,6 @@ CREATE TABLE
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `published_at` DATETIME NULL DEFAULT NULL,
     PRIMARY KEY (`id`),
-    -- FOREIGN KEY (`authorID`) REFERENCES `users`(`id`) ON DELETE CASCADE,  -- اگر جدول users دارید فعال کنید
-    -- FOREIGN KEY (`related_productID`) REFERENCES `products`(`id`) ON DELETE SET NULL, -- اگر products دارید فعال کنید
     INDEX `slug_idx` (`slug`),
     INDEX `status_idx` (`status`),
     INDEX `created_at_idx` (`created_at`),
@@ -1095,7 +1093,7 @@ CREATE TABLE
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_persian_ci;
 
 INSERT INTO
-  `blogs` (
+  `Blogs` (
     `title`,
     `slug`,
     `category`,
@@ -1583,10 +1581,10 @@ QLED برای محیط‌های روشن مناسب‌تر است و رنگ‌ه
   );
 
 -- حذف جدول اگر وجود داشته باشد
-DROP TABLE IF EXISTS `offs`;
+DROP TABLE IF EXISTS `Offs`;
 
 -- ایجاد جدول با ستون endDate
-CREATE TABLE `offs` (
+CREATE TABLE `Offs` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `code` VARCHAR(20) COLLATE utf8mb4_persian_ci NOT NULL,
   `percent` TINYINT UNSIGNED NOT NULL,
@@ -1596,12 +1594,12 @@ CREATE TABLE `offs` (
   `isActive` BOOLEAN NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`),
-  FOREIGN KEY (`adminID`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`adminID`) REFERENCES `Users` (`id`) ON DELETE CASCADE,
   INDEX `date_idx` (`date`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_persian_ci;
 
 -- داده نمونه با 60 رکورد و endDate تا 2025
-INSERT INTO `offs` (`id`, `code`, `percent`, `adminID`, `date`, `endDate`, `isActive`)
+INSERT INTO `Offs` (`id`, `code`, `percent`, `adminID`, `date`, `endDate`, `isActive`)
 VALUES
 (1, 'KX7N4P8', 20, 1, '2023-06-05', '2023-06-20', 1),
 (2, 'Z9T3M2R', 50, 2, '2023-06-21', '2023-07-06', 0),
@@ -1665,20 +1663,20 @@ VALUES
 (60, 'W8P3T6J', 25, 3, '2024-09-17', '2024-10-02', 1);
 
 
-DROP TABLE IF EXISTS `orders`;
+DROP TABLE IF EXISTS `Orders`;
 
-CREATE TABLE `orders` (
+CREATE TABLE `Orders` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `userID` INT UNSIGNED NOT NULL,
   `date` DATE NOT NULL,
   `hour` TIME NOT NULL,
   `isActive` BOOLEAN NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`userID`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`userID`) REFERENCES `Users` (`id`) ON DELETE CASCADE,
   INDEX `date_idx` (`date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_persian_ci;
 
-INSERT INTO `orders` (`userID`, `date`, `hour`, `isActive`) VALUES
+INSERT INTO `Orders` (`userID`, `date`, `hour`, `isActive`) VALUES
 (1, '2025-05-22', '08:15:00', 1),
 (2, '2025-05-22', '12:45:00', 1),
 (3, '2025-05-23', '09:30:00', 0),
@@ -1692,10 +1690,10 @@ INSERT INTO `orders` (`userID`, `date`, `hour`, `isActive`) VALUES
 
 
 
--- Table structure for table `order_items`
-DROP TABLE IF EXISTS `order_items`;
+-- Table structure for table `Order_items`
+DROP TABLE IF EXISTS `Order_items`;
 
-CREATE TABLE `order_items` (
+CREATE TABLE `Order_items` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `orderID` INT UNSIGNED NOT NULL,
   `productID` INT UNSIGNED NOT NULL,
@@ -1707,7 +1705,7 @@ CREATE TABLE `order_items` (
   FOREIGN KEY (`productID`) REFERENCES `products` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_persian_ci;
 
-INSERT INTO `order_items` (`orderID`, `productID`, `quantity`, `price`, `color`) VALUES
+INSERT INTO `Order_items` (`orderID`, `productID`, `quantity`, `price`, `color`) VALUES
 -- سفارش 1: دو محصول
 (1, 1, 2, 30000000, 'red'),
 (1, 2, 1, 15000000, 'blue'),
@@ -1747,10 +1745,10 @@ INSERT INTO `order_items` (`orderID`, `productID`, `quantity`, `price`, `color`)
 (10, 35, 8, 350000, 'cyan');
 
 
--- Creating table structure for `addresses`
-DROP TABLE IF EXISTS `addresses`;
+-- Creating table structure for `Addresses`
+DROP TABLE IF EXISTS `Addresses`;
 
-CREATE TABLE `addresses` (
+CREATE TABLE `Addresses` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` INT(10) UNSIGNED NOT NULL,
   `province` VARCHAR(100) COLLATE utf8_persian_ci NOT NULL,
@@ -1760,11 +1758,11 @@ CREATE TABLE `addresses` (
   `address_type` ENUM('HOME','WORK','OTHER') DEFAULT 'HOME',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  CONSTRAINT fk_user FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+  CONSTRAINT fk_user FOREIGN KEY (`user_id`) REFERENCES `Users`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
 
 -- درج داده
-INSERT INTO `addresses`
+INSERT INTO `Addresses`
   (`user_id`, `province`, `address`, `city`, `postal_code`, `address_type`)
 VALUES
   (1, 'تهران', 'تهران - خیابان ولیعصر - کوچه اول', 'تهران', 1234567890, 'HOME'),
@@ -1783,11 +1781,11 @@ VALUES
   (10,'یزد', 'یزد - خیابان کاشانی - کوچه چهاردهم', 'یزد', 123456789, 'HOME');
 
 
--- Table structure for table `bank cards`
-DROP TABLE IF EXISTS `card_details`;
+-- Table structure for table `Card Details`
+DROP TABLE IF EXISTS `Card_details`;
 
 CREATE TABLE
-  `card_details` (
+  `Card_details` (
     `id` INT (100) NOT NULL AUTO_INCREMENT,
     `user_id` INT (100) NOT NULL,
     `card_number` VARCHAR(255) COLLATE utf8_persian_ci NOT NULL,
@@ -1796,12 +1794,12 @@ CREATE TABLE
     `card_type` ENUM ('VISA', 'MASTERCARD', 'OTHER') DEFAULT 'OTHER',
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+    FOREIGN KEY (`user_id`) REFERENCES `Users` (`id`) ON DELETE CASCADE
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_persian_ci;
 
---Dumping data for table`card_details`
+--Dumping data for table`Card_details`
 INSERT INTO
-  `card_details` (
+  `Card_details` (
     `user_id`,
     `card_number`,
     `cardholder_name`,
@@ -2005,61 +2003,61 @@ VALUES
 --
 -- Indexes for table `cart_details`
 --
-ALTER TABLE `card_details` ADD PRIMARY KEY (`id`),
+ALTER TABLE `Card_details` ADD PRIMARY KEY (`id`),
 ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `admins`
 --
-ALTER TABLE `admins` ADD PRIMARY KEY (`id`);
+ALTER TABLE `Admins` ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `categories`
 --
-ALTER TABLE `categories` ADD PRIMARY KEY (`id`);
+ALTER TABLE `Categories` ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `comments`
 --
-ALTER TABLE `comments` ADD PRIMARY KEY (`id`),
+ALTER TABLE `Comments` ADD PRIMARY KEY (`id`),
 ADD KEY `productID` (`productID`),
 ADD KEY `userID` (`userID`);
 
 --
 -- Indexes for table `offs`
 --
-ALTER TABLE `offs` ADD PRIMARY KEY (`id`),
+ALTER TABLE `Offs` ADD PRIMARY KEY (`id`),
 ADD KEY `adminID` (`adminID`),
 ADD KEY `productID` (`productID`);
 
 --
--- Indexes for table `orders`
+-- Indexes for table `Orders`
 --
-ALTER TABLE `orders` ADD PRIMARY KEY (`id`),
+ALTER TABLE `Orders` ADD PRIMARY KEY (`id`),
 ADD KEY `productID` (`productID`),
 ADD KEY `userID` (`userID`);
 
 --
--- Indexes for table `products`
+-- Indexes for table `Products`
 --
-ALTER TABLE `products` ADD PRIMARY KEY (`id`),
+ALTER TABLE `Products` ADD PRIMARY KEY (`id`),
 ADD KEY `categoryID` (`categoryID`);
 
 --
--- Indexes for table `users`
+-- Indexes for table `Users`
 --
-ALTER TABLE `users` ADD PRIMARY KEY (`id`);
+ALTER TABLE `Users` ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `addresses`
+-- Indexes for table `Addresses`
 --
-ALTER TABLE `addresses` ADD PRIMARY KEY (`id`),
+ALTER TABLE `Addresses` ADD PRIMARY KEY (`id`),
 ADD KEY `user_id` (`user_id`);
 
 --
--- Indexes for table `card_details`
+-- Indexes for table `Card_details`
 --
-ALTER TABLE `card_details` ADD PRIMARY KEY (`id`),
+ALTER TABLE `Card_details` ADD PRIMARY KEY (`id`),
 ADD KEY `user_id` (`user_id`);
 
 -- افزودن ایندکس روی user_id
@@ -2067,111 +2065,111 @@ ADD KEY `user_id` (`user_id`);
 -- AUTO_INCREMENT for dumped tables
 --
 --
--- AUTO_INCREMENT for table `cart_details`
+-- AUTO_INCREMENT for table `Cart_details`
 --
-ALTER TABLE `card_details` MODIFY `id` INT (100) NOT NULL AUTO_INCREMENT,
+ALTER TABLE `Card_details` MODIFY `id` INT (100) NOT NULL AUTO_INCREMENT,
 AUTO_INCREMENT = 28;
 
 --
--- AUTO_INCREMENT for table `admins`
+-- AUTO_INCREMENT for table `Admins`
 --
-ALTER TABLE `admins` MODIFY `id` INT NOT NULL AUTO_INCREMENT = 6,
+ALTER TABLE `Admins` MODIFY `id` INT NOT NULL AUTO_INCREMENT = 6,
 ADD PRIMARY KEY (`id`);
 
--- AUTO_INCREMENT for table `categories`
+-- AUTO_INCREMENT for table `Categories`
 --
-ALTER TABLE `categories` MODIFY `id` int (100) NOT NULL AUTO_INCREMENT,
+ALTER TABLE `Categories` MODIFY `id` int (100) NOT NULL AUTO_INCREMENT,
 AUTO_INCREMENT = 70;
 
 --
--- AUTO_INCREMENT for table `comments`
+-- AUTO_INCREMENT for table `Comments`
 --
-ALTER TABLE `comments` MODIFY `reply_id` INT UNSIGNED NULL DEFAULT NULL;
+ALTER TABLE `Comments` MODIFY `reply_id` INT UNSIGNED NULL DEFAULT NULL;
 
 AUTO_INCREMENT = 61;
 
-UPDATE `comments`
+UPDATE `Comments`
 SET
   `reply_id` = NULL
 WHERE
   `reply_id` = 0;
 
 --
--- AUTO_INCREMENT for table `offs`
+-- AUTO_INCREMENT for table `Offs`
 --
-ALTER TABLE `offs` MODIFY `id` int (100) NOT NULL AUTO_INCREMENT,
+ALTER TABLE `Offs` MODIFY `id` int (100) NOT NULL AUTO_INCREMENT,
 AUTO_INCREMENT = 61;
 
 --
--- AUTO_INCREMENT for table `orders`
+-- AUTO_INCREMENT for table `Orders`
 --
-ALTER TABLE `orders` MODIFY `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+ALTER TABLE `Orders` MODIFY `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 AUTO_INCREMENT = 31;
 
 --
--- AUTO_INCREMENT for table `products`
+-- AUTO_INCREMENT for table `Products`
 --
-ALTER TABLE `products` MODIFY `id` int (100) NOT NULL AUTO_INCREMENT,
+ALTER TABLE `Products` MODIFY `id` int (100) NOT NULL AUTO_INCREMENT,
 AUTO_INCREMENT = 92;
 
 --
--- AUTO_INCREMENT for table `users`
+-- AUTO_INCREMENT for table `Users`
 --
-ALTER TABLE `users` MODIFY `id` int (100) NOT NULL AUTO_INCREMENT,
+ALTER TABLE `Users` MODIFY `id` int (100) NOT NULL AUTO_INCREMENT,
 AUTO_INCREMENT = 24;
 
 --
--- AUTO_INCREMENT for table `addresses`
+-- AUTO_INCREMENT for table `Addresses`
 --
-ALTER TABLE `addresses` MODIFY `id` INT (100) NOT NULL AUTO_INCREMENT,
+ALTER TABLE `Addresses` MODIFY `id` INT (100) NOT NULL AUTO_INCREMENT,
 AUTO_INCREMENT = 29;
 
 --
--- AUTO_INCREMENT for table `card_details`
+-- AUTO_INCREMENT for table `Card_details`
 --
-ALTER TABLE `card_details` MODIFY `id` INT (100) NOT NULL AUTO_INCREMENT,
+ALTER TABLE `Card_details` MODIFY `id` INT (100) NOT NULL AUTO_INCREMENT,
 AUTO_INCREMENT = 28;
 
 --
 -- Constraints for dumped tables
 --
 --
--- Constraints for table `cart_details`
+-- Constraints for table `Card_details`
 --
-ALTER TABLE `card_details` ADD CONSTRAINT `card_details_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+ALTER TABLE `Card_details` ADD CONSTRAINT `card_details_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `Users` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `addresses`
+-- Constraints for table `Addresses`
 --
-ALTER TABLE `addresses` ADD CONSTRAINT `addresses_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+ALTER TABLE `Addresses` ADD CONSTRAINT `addresses_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `Users` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `card_details`
+-- Constraints for table `Card_details`
 --
-ALTER TABLE `card_details` ADD CONSTRAINT `card_details_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+ALTER TABLE `Card_details` ADD CONSTRAINT `card_details_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `Users` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `comments`
+-- Constraints for table `Comments`
 --
-ALTER TABLE `comments` ADD CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`productID`) REFERENCES `products` (`id`),
-ADD CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`userID`) REFERENCES `users` (`id`);
+ALTER TABLE `Comments` ADD CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`productID`) REFERENCES `products` (`id`),
+ADD CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`userID`) REFERENCES `Users` (`id`);
 
 --
--- Constraints for table `offs`
+-- Constraints for table `Offs`
 --
-ALTER TABLE `offs` ADD CONSTRAINT `offs_ibfk_1` FOREIGN KEY (`adminID`) REFERENCES `admins` (`id`),
+ALTER TABLE `Offs` ADD CONSTRAINT `offs_ibfk_1` FOREIGN KEY (`adminID`) REFERENCES `admins` (`id`),
 ADD CONSTRAINT `offs_ibfk_2` FOREIGN KEY (`productID`) REFERENCES `products` (`id`);
 
 --
--- Constraints for table `orders`
+-- Constraints for table `Orders`
 --
-ALTER TABLE `orders` ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`productID`) REFERENCES `products` (`id`),
-ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`userID`) REFERENCES `users` (`id`);
+ALTER TABLE `Orders` ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`productID`) REFERENCES `products` (`id`),
+ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`userID`) REFERENCES `Users` (`id`);
 
 --
--- Constraints for table `products`
+-- Constraints for table `Products`
 --
-ALTER TABLE `products` ADD CONSTRAINT `products_ibfk_1` FOREIGN KEY (`categoryID`) REFERENCES `categories` (`id`);
+ALTER TABLE `Products` ADD CONSTRAINT `products_ibfk_1` FOREIGN KEY (`categoryID`) REFERENCES `categories` (`id`);
 
 COMMIT;
 

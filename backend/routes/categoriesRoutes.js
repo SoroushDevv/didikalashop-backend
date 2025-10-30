@@ -34,7 +34,7 @@ categoriesRouter.delete("/:categoryID", async (req, res) => {
     const categoryID = parseInt(req.params.categoryID);
     if (isNaN(categoryID)) return res.status(400).json({ message: "Invalid categoryID" });
 
-    const [result] = await pool.query("DELETE FROM categories WHERE id = ?", [categoryID]);
+    const [result] = await pool.query("DELETE FROM Categories WHERE id = ?", [categoryID]);
     if (result.affectedRows === 0) return res.status(404).json({ message: "Category not found" });
 
     res.status(200).json({ message: "Category deleted successfully" });
@@ -52,7 +52,7 @@ categoriesRouter.put("/active-category/:categoryID/:isActive", async (req, res) 
 
     if (isNaN(categoryID)) return res.status(400).json({ message: "Invalid categoryID" });
 
-    const [result] = await pool.query("UPDATE categories SET isActive = ? WHERE id = ?", [isActive, categoryID]);
+    const [result] = await pool.query("UPDATE Categories SET isActive = ? WHERE id = ?", [isActive, categoryID]);
     if (result.affectedRows === 0) return res.status(404).json({ message: "Category not found" });
 
     res.status(200).json({ message: "Category status updated successfully" });

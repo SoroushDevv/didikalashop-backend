@@ -25,7 +25,7 @@ addressesRouter.get("/", authenticateToken, async (req, res) => {
     const userID = req.user.id;
     const [result] = await pool.query(
       `SELECT id, user_id AS userID, province, address, city, postal_code AS postalCode, address_type AS addressType, created_at AS createdAt
-       FROM addresses WHERE user_id = ?`,
+       FROM Addresses WHERE user_id = ?`,
       [userID]
     );
     res.status(200).json(result);
@@ -47,7 +47,7 @@ addressesRouter.post("/", authenticateToken, async (req, res) => {
 
     const userID = req.user.id;
     const [result] = await pool.query(
-      `INSERT INTO addresses (user_id, province, address, city, postal_code, address_type)
+      `INSERT INTO Addresses (user_id, province, address, city, postal_code, address_type)
        VALUES (?, ?, ?, ?, ?, ?)`,
       [userID, province.trim(), address.trim(), city.trim(), postalCode, addressType]
     );
@@ -72,7 +72,7 @@ addressesRouter.put("/:addressID", authenticateToken, async (req, res) => {
 
     const userID = req.user.id;
     const [result] = await pool.query(
-      `UPDATE addresses SET province = ?, address = ?, city = ?, postal_code = ?, address_type = ? WHERE id = ? AND user_id = ?`,
+      `UPDATE Addresses SET province = ?, address = ?, city = ?, postal_code = ?, address_type = ? WHERE id = ? AND user_id = ?`,
       [province.trim(), address.trim(), city.trim(), postalCode, addressType, addressID, userID]
     );
 
@@ -92,7 +92,7 @@ addressesRouter.delete("/:addressID", authenticateToken, async (req, res) => {
 
     const userID = req.user.id;
     const [result] = await pool.query(
-      `DELETE FROM addresses WHERE id = ? AND user_id = ?`,
+      `DELETE FROM Addresses WHERE id = ? AND user_id = ?`,
       [addressID, userID]
     );
 
