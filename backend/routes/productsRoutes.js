@@ -3,13 +3,13 @@ const pool = require("./../db/SabzLearnShop"); // بدون .promise()
 
 const productsRouter = express.Router();
 
-// GET all products
+// GET all Products
 productsRouter.get("/", async (req, res) => {
   try {
-    const [products] = await pool.query("SELECT * FROM products");
+    const [products] = await pool.query("SELECT * FROM Products");
     res.status(200).json(products);
   } catch (err) {
-    console.error("Error fetching products:", err);
+    console.error("Error fetching Products:", err);
     res.status(500).json({ error: "خطا در دریافت محصولات" });
   }
 });
@@ -40,7 +40,7 @@ productsRouter.post("/", async (req, res) => {
 
   try {
     const [result] = await pool.query(
-      `INSERT INTO products
+      `INSERT INTO Products
        (title, price, count, img, popularity, sale, hasDiscount,
         discountEndDate, discountPercent, colors, productDesc, url, categoryID)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -95,7 +95,7 @@ productsRouter.put("/:productID", async (req, res) => {
 
   try {
     const [result] = await pool.query(
-      `UPDATE products
+      `UPDATE Products
        SET title = ?, price = ?, count = ?, img = ?, popularity = ?, sale = ?,
            hasDiscount = ?, discountEndDate = ?, discountPercent = ?,
            colors = ?, productDesc = ?, url = ?, categoryID = ?
