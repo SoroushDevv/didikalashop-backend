@@ -30,7 +30,7 @@ ordersRouter.post("/", authenticateToken, async (req, res) => {
     if (!hour || !/^\d{2}:\d{2}:\d{2}$/.test(hour)) return res.status(400).json({ message: "Invalid hour format" });
     if (!Array.isArray(items) || items.length === 0) return res.status(400).json({ message: "Order must contain at least one product" });
 
-    const [userResult] = await pool.query("SELECT id FROM users WHERE id = ?", [userID]);
+    const [userResult] = await pool.query("SELECT id FROM Users WHERE id = ?", [userID]);
     if (userResult.length === 0) return res.status(404).json({ message: "User not found" });
 
     const [orderInsert] = await pool.query(
@@ -46,7 +46,7 @@ ordersRouter.post("/", authenticateToken, async (req, res) => {
       if (!productID || isNaN(productID)) continue;
       if (!color || color.trim() === "") continue;
 
-      const [productResult] = await pool.query("SELECT id, price FROM products WHERE id = ?", [productID]);
+      const [productResult] = await pool.query("SELECT id, price FROM Products WHERE id = ?", [productID]);
       if (productResult.length === 0) continue;
 
       const price = productResult[0].price;
@@ -134,7 +134,7 @@ ordersRouter.delete("/:orderID", async (req, res) => {
     const orderID = parseInt(req.params.orderID);
     if (isNaN(orderID)) return res.status(400).json({ message: "Invalid orderID" });
 
-    await pool.query("DELETE FROM order_items WHERE orderID = ?", [orderID]);
+    await pool.query("DELETE FROM Order_items WHERE orderID = ?", [orderID]);
     const [result] = await pool.query("DELETE FROM Orders WHERE id = ?", [orderID]);
 
     if (result.affectedRows === 0) return res.status(404).json({ message: "Order not found" });
@@ -170,7 +170,7 @@ ordersRouter.put("/active-order/:orderID", async (req, res) => {
         if (color !== undefined) { updates.push("color = ?"); values.push(color); }
         if (updates.length > 0 && orderItemID) {
           values.push(orderItemID);
-          await pool.query(`UPDATE order_items SET ${updates.join(", ")} WHERE id = ?`, values);
+          await pool.query(`UPDATE Order_items SET ${updates.join(", ")} WHERE id = ?`, values);
         }
       }
     }
