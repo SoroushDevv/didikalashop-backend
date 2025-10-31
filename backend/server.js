@@ -34,10 +34,10 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-  console.log("✅ User connected:", socket.id);
+  console.log("User connected:", socket.id);
 
   socket.on("disconnect", () => {
-    console.log("❌ User disconnected:", socket.id);
+    console.log("User disconnected:", socket.id);
   });
 });
 
@@ -84,5 +84,5 @@ app.use((err, req, res, next) => {
   res.status(500).send({ message: "Something went wrong!" });
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8000;
 server.listen(port, '0.0.0.0', () => console.log(`🚀 Server running on port ${port}`));

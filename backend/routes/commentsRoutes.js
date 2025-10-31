@@ -69,6 +69,7 @@ commentsRouter.post("/", async (req, res) => {
     const newComment = await fetchCommentByID(result.insertId);
     res.status(201).json(newComment);
   } catch (err) {
+        console.error("POST /comments ERROR:", err);  // ← این خط اضافه کن
     res.status(500).json({ message: "Database error", details: err.message });
   }
 });
